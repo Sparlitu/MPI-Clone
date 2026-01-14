@@ -30,7 +30,6 @@ public class TestPi {
         // 3. Aggregate results (Manual Reduce)
         if (rank == 0) {
             long totalHits = hits;
-            long processed = 1; // self
 
             // Receive from all other ranks
             for (int i = 1; i < size; i++) {
@@ -38,7 +37,6 @@ public class TestPi {
                 try {
                     long remoteHits = Long.parseLong(msg);
                     totalHits += remoteHits;
-                    processed++;
                 } catch (Exception e) {
                     System.err.println("Rank 0: Error parsing message '" + msg + "'");
                 }

@@ -3,7 +3,7 @@ package mpi;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.*;
+// unused import removed
 
 public class MPI {
     private static int rank;
@@ -133,8 +133,9 @@ public class MPI {
                 // Non-roots wait for payload
                 while (true) {
                     int cmd = in.readInt();
-                    if (cmd == 6) { // CMD=6 (BCAST_PAYLOAD)
-                        int r = in.readInt(); // Root (from Router)
+                    if (cmd == 6) {
+                        // CMD=6 (BCAST_PAYLOAD)
+                        /* int r = */ in.readInt(); // Root (from Router)
                         String msg = in.readUTF();
                         return msg;
                     } else if (cmd == 2) { // CMD=2 (INCOMING MSG)
