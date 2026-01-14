@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+    }
+}
+
+application {
+    mainClass = 'mpiexec'
+}
+
+// Helper task to print classpath, useful for tests
+task printClasspath {
+    doLast {
+        println sourceSets.main.runtimeClasspath.asPath
+        println sourceSets.test.runtimeClasspath.asPath
+    }
+}
+

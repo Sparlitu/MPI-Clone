@@ -1,0 +1,26 @@
+# Gradle files
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDEA files
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Eclipse files
+.classpath
+.project
+.settings/
+bin/
+
+# Java class files
+*.class
+
+# Log files
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db

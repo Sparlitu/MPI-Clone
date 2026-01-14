@@ -1,5 +1,9 @@
+package mpi;
+
 import java.io.*;
 import java.net.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class MPI {
     private static int rank;
@@ -9,6 +13,9 @@ public class MPI {
     private static Socket socket;
     private static DataInputStream in;
     private static DataOutputStream out;
+
+    // Message Buffer for P2P messages received during collective ops
+    private static Queue<String> messageQueue = new LinkedList<>();
 
     public static void init() {
         try {
@@ -62,13 +69,22 @@ public class MPI {
 
     public static String receive() {
         try {
+            // 1. Check Buffer First
+            if (!messageQueue.isEmpty()) {
+                return messageQueue.poll();
+            }
+
+            // 2. Read from Socket
             while (true) {
                 int cmd = in.readInt();
                 if (cmd == 2) { // CMD=2 (INCOMING MSG)
-                    int src = in.readInt();
+                    int src = in.readInt(); // consumed but not used in this simple API
                     String msg = in.readUTF();
                     System.out.println("[MPI Debug] Received from " + src);
                     return msg;
+                } else {
+                    System.err.println("Protocol Error in receive(): Expected MSG (2), got " + cmd);
+                    System.exit(1);
                 }
             }
         } catch (IOException e) {
@@ -90,6 +106,12 @@ public class MPI {
                     in.readInt();
                     in.readUTF();
                     break;
+                } else if (cmd == 2) { // CMD=2 (INCOMING MSG)
+                    // Unexpected P2P message, Buffer it!
+                    int src = in.readInt();
+                    String msg = in.readUTF();
+                    System.out.println("[MPI Debug] Buffering P2P msg from " + src + " during Barrier");
+                    messageQueue.add(msg);
                 } else {
                     System.err.println("Protocol Error: Expected Barrier Release (4), got " + cmd);
                     System.exit(1);
@@ -115,9 +137,12 @@ public class MPI {
                         int r = in.readInt(); // Root (from Router)
                         String msg = in.readUTF();
                         return msg;
-                    } else if (cmd == 2) {
-                        System.out.println("[MPI Debug] Received unexpected MSG checking for Bcast: " + cmd);
-                        // In a real impl, we'd buffer this. Here we drop or print.
+                    } else if (cmd == 2) { // CMD=2 (INCOMING MSG)
+                        // Unexpected P2P message, Buffer it!
+                        int src = in.readInt();
+                        String msg = in.readUTF();
+                        System.out.println("[MPI Debug] Buffering P2P msg from " + src + " during Bcast");
+                        messageQueue.add(msg);
                     } else {
                         System.err.println("Protocol Error: Expected Bcast Payload (6), got " + cmd);
                         System.exit(1);

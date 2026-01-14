@@ -1,3 +1,5 @@
+package mpi;
+
 public class TestMPI {
     public static void main(String[] args) {
         MPI.init();

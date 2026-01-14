@@ -1,3 +1,5 @@
+package mpi;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -146,8 +148,6 @@ public class mpiexec {
             e.printStackTrace();
         }
     }
-
-    // --- Message Router for Bonus ---
 
     static class MessageRouter extends Thread {
         private ServerSocket server;
